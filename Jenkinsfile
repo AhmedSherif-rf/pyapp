@@ -14,14 +14,22 @@ pipeline {
             steps {
                 script{
                     echo 'deploying the app'
-                    sh 'docker run -ti -d pythonapp'
+                    sh 'docker run -it -d --name=app pythonapp'
+                    sh 'sh script.sh'
                 }
             }
         }
         stage('Deliver') {
             steps {
                 script{
-                   echo 'Deliver stage deploy on some server'
+                   while (true) {
+                     def cmd = input(message: 'Jenkins Interactive Shell', parameters: [
+                     string(name: 'cmd', description: 'Enter a command or leave blank to continue job.', defaultValue: '')
+                    ], ok: 'Execute')
+                    if (cmd == '') { print 'Continuing job...'; break; }
+                    try { sh cmd }
+                    catch (err) { }
+                    }
                 }
             }
         }
